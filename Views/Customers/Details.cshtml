@@ -1,0 +1,31 @@
+﻿@model Vidly.Models.Customer
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>
+    @if (Model == null)
+    {
+        <text>Customer Not Found</text>
+    }
+    else
+    {
+        @Model.Name;    
+    }
+</h1>
+
+<ul>
+    <li>
+        Membeship Type: @Model.MembershipType.Name
+    </li>
+
+    @if (Model.BirthDate.HasValue)
+    {
+        <li>
+            Birthdate: @Model.BirthDate.Value.ToString("dd/MM/yyyy")
+        </li>
+    }
+</ul>
+
