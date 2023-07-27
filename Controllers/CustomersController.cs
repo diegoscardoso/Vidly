@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Vidly.Data;
 using Vidly.Models;
+using Vidly.ViewModels;
 
 namespace Vidly.Controllers
 {
@@ -21,7 +22,6 @@ namespace Vidly.Controllers
             return View(customer);
         }
 
-        [HttpGet]
         public IActionResult Details(int id)
         {
             var customer = _context.Customers.Include(o => o.MembershipType).SingleOrDefault(x => x.Id == id);
@@ -30,6 +30,25 @@ namespace Vidly.Controllers
                 return NotFound();
            
             return View(customer);
+        }
+
+        public IActionResult Add()
+        {
+            var membershipTypes = _context.MembershipType.ToList();
+            
+            return View(new AddCustomerModelView { 
+                  MembershipTypes = membershipTypes
+            });
+        }
+
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public IActionResult Add(Customer customer)
+        {
+            _context.Customers.Add(customer);
+            _context.SaveChanges();
+            
+            return RedirectToAction("Index", "Customers");
         }
     }
 }
