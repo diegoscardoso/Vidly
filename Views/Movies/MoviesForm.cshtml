@@ -1,0 +1,51 @@
+﻿@model Vidly.ViewModels.MovieFormViewModel;
+
+<h2>
+    @if (Model.MovieFormType == Vidly.ViewModels.MovieFormType.Edit)
+    {
+        <text>Edit Movie</text>
+    }
+    else
+    {
+        <text>New Movie</text>    
+    }
+</h2>
+
+@using (Html.BeginForm("Save", "Movies"))
+{
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Name)
+        @Html.TextBoxFor(m => m.Name, null, new { @class = "form-control"})
+        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Description)
+        @Html.TextBoxFor(m => m.Description, null, new { @class = "form-control"})
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.ReleaseDate)
+        @Html.TextBoxFor(m => m.ReleaseDate, "{0: d MMM yyyy}", new { @class = "form-control"})
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.GenreId)
+        @Html.DropDownListFor(m => m.GenreId, new SelectList(Model.MoviesGenres, "Id", "Name" ), "Select", new { @class = "form-control select"})
+        <span asp-validation-for="GenreId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.StockQuantity)
+        @Html.TextBoxFor(m => m.StockQuantity, null, new { @class = "form-control"})
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+
+
+}
+

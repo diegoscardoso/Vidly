@@ -22,31 +22,47 @@ namespace Vidly.Controllers
             return View(customer);
         }
 
-        public IActionResult Details(int id)
-        {
-            var customer = _context.Customers.Include(o => o.MembershipType).SingleOrDefault(x => x.Id == id);
-
-            if (customer == null)
-                return NotFound();
-           
-            return View(customer);
-        }
-
         public IActionResult Add()
         {
             var membershipTypes = _context.MembershipType.ToList();
             
-            return View(new AddCustomerModelView { 
+            return View("CustomerForm", new CustomerFormViewModel { 
                   MembershipTypes = membershipTypes
             });
         }
 
+        public IActionResult Edit(int id)
+        {
+            var customer = _context.Customers.SingleOrDefault(o => o.Id == id);
+
+            if (customer == null) 
+                return NotFound();
+
+            var viewModel = new CustomerFormViewModel
+            {
+                Customer = customer,
+                MembershipTypes = _context.MembershipType.ToList()
+            }; 
+
+            return View("CustomerForm", viewModel);  
+        }
+
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public IActionResult Add(Customer customer)
+        public async Task<IActionResult> Save(Customer customer)
         {
-            _context.Customers.Add(customer);
-            _context.SaveChanges();
+            if (customer.Id == 0)
+                _context.Customers.Add(customer);
+            else
+            {
+                var c = _context.Customers.Single(o => o.Id == customer.Id);
+                c.Name = customer.Name;
+                c.BirthDate = customer.BirthDate;
+                c.MembershipTypeId = customer.MembershipTypeId;
+                c.IsSubscribedToNewsletter = customer.IsSubscribedToNewsletter;
+            }
+            
+            await _context.SaveChangesAsync();
             
             return RedirectToAction("Index", "Customers");
         }

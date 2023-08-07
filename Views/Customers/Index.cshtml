@@ -7,6 +7,7 @@
 
 <h1>Customers</h1>
 
+@Html.ActionLink("New Customer", "Add", "Customers", null, new { @class = "btn btn-primary"})
 @if(Model != null && Model.Count > 0)
 {
     <table class="table">
@@ -23,14 +24,14 @@
             {
                 <tr>
                     <td>@customer.Id</td>
-                    <td>@Html.ActionLink(@customer.Name, "Details", "Customers", new { Id = customer.Id })</td>
+                    <td>@Html.ActionLink(@customer.Name, "Edit", "Customers", new { Id = customer.Id })</td>
                     <td>@customer?.MembershipType?.Name</td>
                     <td>@customer?.MembershipType?.DiscountRate%</td>
                 </tr>
             }
         </tbody>
     </table>
-    @Html.ActionLink("Add new Customer", "Add", "Customers")
+   
 }
 else
 {

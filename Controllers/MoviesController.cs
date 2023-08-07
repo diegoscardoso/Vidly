@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Vidly.Data;
+using Vidly.Models;
+using Vidly.ViewModels;
 
 namespace Vidly.Controllers
 {
@@ -25,11 +28,79 @@ namespace Vidly.Controllers
             return View(_movies);
         }
 
-        public IActionResult Details(int id) 
+        public IActionResult Add()
+        {
+
+            var genres = _context.Genres.ToList();
+
+            var model = new MovieFormViewModel
+            {
+                MovieFormType = MovieFormType.Add,
+                MoviesGenres = genres
+            };
+
+            return View("MoviesForm", model);
+        }
+
+        public IActionResult Edit(int id) 
         {
             var movie = _context.Movies.Include(o => o.Genre).FirstOrDefault(x => x.Id == id);
 
-            return View(movie);
+            if (movie == null)
+                return NotFound();
+            
+            var genres = _context.Genres.ToList();
+
+            var viewModel = new MovieFormViewModel
+            {
+                MovieFormType = MovieFormType.Edit,
+                MoviesGenres = genres,
+                Name = movie.Name, 
+                Description = movie.Description,
+                GenreId = movie.MoviesGenreId,
+                ReleaseDate = movie.ReleaseDate,
+                StockQuantity = movie.StockQuantity
+            };
+
+            return View("MoviesForm", viewModel);
+        }
+
+        public async Task<IActionResult> Save(MovieFormViewModel movie) {
+
+            if (ModelState.IsValid)
+            {
+                if (movie.Id == 0)
+                {
+                    _context.Movies.Add(new Models.Movie
+                    {
+                        Name = movie.Name,
+                        Description = movie.Description,
+                        DataAdded = DateTime.Now,
+                        MoviesGenreId = movie.GenreId,
+                        ReleaseDate = movie.ReleaseDate,
+                        StockQuantity = movie.StockQuantity
+                    });
+                }
+                else
+                {
+                    var m = await _context.Movies.SingleAsync(o => o.Id == movie.Id);
+                    m.Name = movie.Name;
+                    m.Description = movie.Description;
+                    m.MoviesGenreId = movie.GenreId;
+                    m.ReleaseDate = movie.ReleaseDate;
+                    m.StockQuantity = movie.StockQuantity;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                var genres = _context.Genres.ToList();
+                movie.MoviesGenres = genres;
+                return View("MoviesForm", movie);
+            }
         }
 
         [Route(@"movies/released/{year:regex(\d{{4}}):range(2000,2040)}/{month:regex(\d{{2}}):range(1,12)}")]
@@ -37,6 +108,7 @@ namespace Vidly.Controllers
         {
             return Content(year + "/" + month);
         }
+
         #endregion
     }
 }
