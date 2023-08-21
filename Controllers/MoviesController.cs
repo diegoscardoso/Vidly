@@ -64,7 +64,8 @@ namespace Vidly.Controllers
 
             return View("MoviesForm", viewModel);
         }
-
+        [ValidateAntiForgeryToken]
+        [HttpPost]
         public async Task<IActionResult> Save(MovieFormViewModel movie) {
 
             if (ModelState.IsValid)
@@ -76,8 +77,8 @@ namespace Vidly.Controllers
                         Name = movie.Name,
                         Description = movie.Description,
                         DataAdded = DateTime.Now,
-                        MoviesGenreId = movie.GenreId,
-                        ReleaseDate = movie.ReleaseDate,
+                        MoviesGenreId = movie.GenreId.Value,
+                        ReleaseDate = movie.ReleaseDate.Value,
                         StockQuantity = movie.StockQuantity
                     });
                 }
@@ -86,8 +87,8 @@ namespace Vidly.Controllers
                     var m = await _context.Movies.SingleAsync(o => o.Id == movie.Id);
                     m.Name = movie.Name;
                     m.Description = movie.Description;
-                    m.MoviesGenreId = movie.GenreId;
-                    m.ReleaseDate = movie.ReleaseDate;
+                    m.MoviesGenreId = movie.GenreId.Value;
+                    m.ReleaseDate = movie.ReleaseDate.Value;
                     m.StockQuantity = movie.StockQuantity;
                 }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata.Ecma335;
 using Vidly.Data;
 using Vidly.Models;
 using Vidly.ViewModels;
@@ -27,7 +28,8 @@ namespace Vidly.Controllers
             var membershipTypes = _context.MembershipType.ToList();
             
             return View("CustomerForm", new CustomerFormViewModel { 
-                  MembershipTypes = membershipTypes
+                Customer = new Customer(),  
+                MembershipTypes = membershipTypes
             });
         }
 
@@ -51,6 +53,15 @@ namespace Vidly.Controllers
         [HttpPost]
         public async Task<IActionResult> Save(Customer customer)
         {
+            if (!ModelState.IsValid)
+            {
+                return View("CustomerForm", new CustomerFormViewModel
+                {
+                     Customer = customer, 
+                     MembershipTypes = await _context.MembershipType.ToListAsync()
+                });
+            }
+            
             if (customer.Id == 0)
                 _context.Customers.Add(customer);
             else

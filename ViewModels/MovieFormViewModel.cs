@@ -12,18 +12,21 @@ namespace Vidly.ViewModels
         [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; }
 
-        public string Description { get; set; } 
+        public string? Description { get; set; } 
         
         [Display(Name = "Release Date")]
-        public DateTime ReleaseDate { get; set; }
+        [Required(ErrorMessage = "Release Date is required.")]
+        public DateTime? ReleaseDate { get; set; }
 
         [Required(ErrorMessage = "Genre is required.")]
         [Display(Name = "Genre")]
-        public int GenreId { get; set; }
+        public int? GenreId { get; set; }
 
         public IEnumerable<MoviesGenre> MoviesGenres { get; set; } = Enumerable.Empty<MoviesGenre>();
 
         [Display(Name = "Number in Stock")]
+        [Range(1,20)]
+        [Required]
         public int StockQuantity { get; set; }
     }
 
